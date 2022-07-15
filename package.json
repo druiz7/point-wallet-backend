@@ -1,0 +1,26 @@
+{
+  "name": "point-wallet-backend",
+  "version": "1.0.0",
+  "description": "A simple express.js backend that stores points that can be redeemed in the order that they are earned",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/druiz7/point-wallet-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/druiz7/point-wallet-backend/issues"
+  },
+  "homepage": "https://github.com/druiz7/point-wallet-backend#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
