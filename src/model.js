@@ -11,6 +11,11 @@ class Model {
    * txQueue: [{tx1},{tx2},{tx3},...,{txN}]
    */
   constructor() {
+    this.reset();
+  }
+
+  // resets the model
+  reset() {
     this.payers = {};
     this.txQueue = [];
   }
@@ -28,6 +33,7 @@ class Model {
   addPoints(tx) {
     const { payer, points, timestamp } = tx;
     if (!this.payers.hasOwnProperty(payer)) {
+      this.payers[payer] = {};
       this.payers[payer].balance = 0;
     }
 
@@ -49,7 +55,7 @@ class Model {
     const pointsSpent = {};
     while (pointsToSpend > 0) {
       // spends points from transactions until all points are spent
-      const leastRecentTx = this.txQueue.peek();
+      const [leastRecentTx] = this.txQueue; // gets first tx
       const { payer, points } = leastRecentTx;
       if (pointsToSpend > points) {
         // all points from that transaction are spent
@@ -64,7 +70,13 @@ class Model {
       }
     }
 
-    return pointsSpent;
+    const formatOut = [];
+    for (const payer in pointsSpent) {
+      formatOut.push({ payer: payer, points: -pointsSpent[payer] });
+      this.payers[payer].balance -= pointsSpent[payer];
+    }
+
+    return formatOut;
   }
 
   // checks if the payers have enough points to spend

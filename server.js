@@ -1,48 +1,41 @@
 const express = require("express");
 const app = express();
-const session = require("express-session");
 const Model = require("./src/model.js");
 
 app.use(express.json());
-app.use(
-  session({
-    secret: "keyboard cat",
-    resave: true,
-    saveUninitialized: true,
-    cookie: { maxAge: 6000 },
-  })
-);
-
-const createModelIfNeeded = (req) => {
-  req.session.model = req.session.model || new Model();
-};
+const wallet = new Model();
 
 app.post("/add-points", (req, res) => {
-  createModelIfNeeded(req);
-
-  const wallet = req.session.model;
   wallet.addPoints(req.body);
+  res.end();
 });
 
 app.get("/balance", (req, res) => {
-  createModelIfNeeded(req);
-
-  const wallet = req.session.model;
   const balances = wallet.getBalances();
   res.json(balances);
 });
 
 app.post("/spend-points", (req, res) => {
-  createModelIfNeeded(req);
-
-  const wallet = req.session.model;
   const pointsSpent = wallet.spendPoints(req.body.points);
-  const formatOut = [];
-  for (const payer in pointsSpent) {
-    formatOut.push({ payer: payer, points: pointsSpent[payer] });
-  }
+  res.json(pointsSpent);
+});
 
-  res.json(formatOut);
+app.get("/test/setup", (req, res) => {
+  wallet.reset();
+
+  const txs = [
+    { payer: "DANNON", points: 1000, timestamp: "2020-11-02T14:00:00Z" },
+    { payer: "UNILEVER", points: 200, timestamp: "2020-10-31T11:00:00Z" },
+    { payer: "DANNON", points: -200, timestamp: "2020-10-31T15:00:00Z" },
+    { payer: "MILLER COORS", points: 10000, timestamp: "2020-11-01T14:00:00Z" },
+    { payer: "DANNON", points: 300, timestamp: "2020-10-31T10:00:00Z" },
+  ];
+
+  txs.forEach((tx) => {
+    wallet.addPoints(tx);
+  });
+
+  res.end();
 });
 
 app.listen(3000);
