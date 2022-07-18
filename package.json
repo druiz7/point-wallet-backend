@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/druiz7/point-wallet-backend#readme",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "express-session": "^1.17.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"

@@ -1,4 +1,4 @@
-class model {
+class Model {
   // payers data model
   /**
    * payers {
@@ -78,3 +78,5 @@ class model {
     return sum >= pointsToSpend;
   }
 }
+
+module.exports = Model;
