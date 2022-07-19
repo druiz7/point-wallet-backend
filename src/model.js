@@ -52,30 +52,44 @@ class Model {
   spendPoints(pointsToSpend) {
     if (!this.#hasPoints(pointsToSpend)) return {}; // there are not enough points to spend
 
-    const pointsSpent = {};
+    const pointsSpent = {}; // this array will contain the amounts of points spent per payer
     while (pointsToSpend > 0) {
-      // spends points from transactions until all points are spent
+      // spends points from transactions until all points are spent,
+      // this means that it will run until sum(pointsSpent[payer]) === original value of poinsToSpend
       const [leastRecentTx] = this.txQueue; // gets first tx
       const { payer, points } = leastRecentTx;
+      pointsSpent[payer] = pointsSpent[payer] || 0; // assigns it a defualt value, if needed
 
-      if (pointsToSpend >= points) {
-        // all points from that transaction are spent
+      // undo spending points in case if pointsSpent new value is negative
+      if (pointsSpent[payer] > 0) pointsToSpend += pointsSpent[payer];
+
+      // if this is a negative transaction, or
+      // if this whole transaction will be used since the sum of points is
+      //  still less than the points needed to be spent
+      if (points < 0 || pointsToSpend >= pointsSpent[payer] + points) {
         this.txQueue.shift();
-        pointsSpent[payer] = (pointsSpent[payer] || 0) + points;
-        pointsToSpend -= points;
+        pointsSpent[payer] = pointsSpent[payer] + points;
+
+        // deduct points spent for this payer if it is positive
+        if (pointsSpent[payer] > 0) {
+          pointsToSpend -= pointsSpent[payer];
+        }
       } else {
-        // some of the points from that transaction are spent
+        // partial points from this transaction will be used since
+        //  it is greater than the remaining points needed to be spent
         leastRecentTx.points -= pointsToSpend;
-        pointsSpent[payer] = (pointsSpent[payer] || 0) + pointsToSpend;
+        pointsSpent[payer] += pointsToSpend;
         pointsToSpend = 0;
       }
     }
 
     const formatOut = [];
     for (const payer in pointsSpent) {
-      const points = -pointsSpent[payer];
-      formatOut.push({ payer, points });
-      this.payers[payer].balance -= pointsSpent[payer];
+      const points = pointsSpent[payer];
+      if (points > 0) {
+        formatOut.push({ payer: payer, points: -points });
+        this.payers[payer].balance -= points;
+      }
     }
 
     return formatOut;
