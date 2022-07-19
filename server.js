@@ -5,21 +5,25 @@ const Model = require("./src/model.js");
 app.use(express.json());
 const wallet = new Model();
 
+// route to add points
 app.post("/add-points", (req, res) => {
   wallet.addPoints(req.body);
   res.end();
 });
 
+// route to check balance
 app.get("/balance", (req, res) => {
   const balances = wallet.getBalances();
   res.json(balances);
 });
 
+// route to spend points
 app.post("/spend-points", (req, res) => {
   const pointsSpent = wallet.spendPoints(req.body.points);
   res.json(pointsSpent);
 });
 
+// route to set up wallet just like the test case
 app.get("/test/setup", (req, res) => {
   wallet.reset();
 

@@ -1,5 +1,5 @@
 class Model {
-  // payers data model
+  // payer-tx data model
   /**
    * payers {
    *  "payerName": {
@@ -57,7 +57,8 @@ class Model {
       // spends points from transactions until all points are spent
       const [leastRecentTx] = this.txQueue; // gets first tx
       const { payer, points } = leastRecentTx;
-      if (pointsToSpend > points) {
+
+      if (pointsToSpend >= points) {
         // all points from that transaction are spent
         this.txQueue.shift();
         pointsSpent[payer] = (pointsSpent[payer] || 0) + points;
@@ -72,7 +73,8 @@ class Model {
 
     const formatOut = [];
     for (const payer in pointsSpent) {
-      formatOut.push({ payer: payer, points: -pointsSpent[payer] });
+      const points = -pointsSpent[payer];
+      formatOut.push({ payer, points });
       this.payers[payer].balance -= pointsSpent[payer];
     }
 
