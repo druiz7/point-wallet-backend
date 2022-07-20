@@ -16,6 +16,10 @@ The routes to interact with the application are as follows:
 
 ## Testing:
 
+To start the app, run
+
+`npm run devStart`
+
 The application can be tested using bash with curl commands.
 
 For example, typing the following command will set up the model to the assignment's test case:

@@ -63,12 +63,17 @@ class Model {
       // undo spending points in case if pointsSpent new value is negative
       if (pointsSpent[payer] > 0) pointsToSpend += pointsSpent[payer];
 
+      const payerPointsSpent = Math.min(
+        pointsSpent[payer] + points,
+        this.payers[payer].balance
+      );
+
       // if this is a negative transaction, or
       // if this whole transaction will be used since the sum of points is
       //  still less than the points needed to be spent
-      if (points < 0 || pointsToSpend >= pointsSpent[payer] + points) {
+      if (points < 0 || pointsToSpend >= payerPointsSpent) {
         this.txQueue.shift();
-        pointsSpent[payer] = pointsSpent[payer] + points;
+        pointsSpent[payer] = payerPointsSpent;
 
         // deduct points spent for this payer if it is positive
         if (pointsSpent[payer] > 0) {
@@ -77,8 +82,8 @@ class Model {
       } else {
         // partial points from this transaction will be used since
         //  it is greater than the remaining points needed to be spent
-        leastRecentTx.points -= pointsToSpend;
-        pointsSpent[payer] += pointsToSpend;
+        leastRecentTx.points -= pointsToSpend - pointsSpent[payer];
+        pointsSpent[payer] += pointsToSpend - pointsSpent[payer];
         pointsToSpend = 0;
       }
     }
